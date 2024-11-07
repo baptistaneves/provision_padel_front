@@ -1,0 +1,88 @@
+<!-- Start Breadcrumbs -->
+<app-breadcrumbs title="Vídeos" [breadcrumbItems]="breadCrumbItems"></app-breadcrumbs>
+<!-- End Breadcrumbs -->
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-xxl-12 col-sm-12">
+                        <div>
+                            <input type="search" class="form-control" placeholder="Buscar vídeo pelo nome">
+                        </div>
+                    </div><!--end col-->
+                </div><!--end row-->
+            </div>
+        </div>
+    </div><!--end col-->
+</div><!--end row-->
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <h5 class="card-title mb-0">Vídeos 
+                        <span *ngIf="videos.length > 0" class="badge bg-dark-subtle text-dark ms-1">{{videos.length}}</span>
+                        <span *ngIf="videos.length <= 0" class="badge bg-dark-subtle text-dark ms-1">0</span>
+                    </h5>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive"  *ngIf="videos.length > 0">
+                    <table class="table table-centered align-middle table-nowrap mb-0">
+                        <thead class="table-active">
+                            <tr>
+                                <th class="sort cursor-pointer">Nome</th>
+                                <th class="sort cursor-pointer">Data Inicio</th>
+                                <th class="sort cursor-pointer">Data Fim</th>
+                                <th class="sort cursor-pointer">Tamanho</th>
+                                <th class="sort cursor-pointer">Câmara</th>
+                            </tr>
+                        </thead>
+                        <tbody class="list form-check-all">
+                            <tr *ngFor="let video of videos">
+                                <td class="products" (click)="onSelectedVideo(video.name)">{{video.name}}</td>
+                                <td class="products">{{video.startTime | date}}</td>
+                                <td class="products">{{video.endTime | date}}</td>
+                                <td class="products">{{ formatSize(video.size) }}</td>
+                                <td class="products">{{video.channel}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div><!--end table-responsive-->
+
+                <div class="row">
+                    <div class="col-12">
+                        <video autoplay style="height: 300px;width: 400px;" controls #videoPlayer>
+                            <source type="video/mp4" />
+                        </video>
+                    </div>
+                </div>
+
+                <div class="noresult" *ngIf="videos.length <= 0">
+                    <div class="text-center py-4">
+                        <div class="avatar-md mx-auto mb-4">
+                            <div class="avatar-title bg-light text-primary rounded-circle fs-4xl">
+                                <i class="bi bi-search"></i>
+                            </div>
+                        </div>
+                        <h5 class="mt-2">Nenhum vídeo gravado!</h5>
+                        <p class="text-muted mb-0">Todos vídeos gravados serão listados aqui.</p>
+                    </div>
+                </div>
+                <!-- end noresult -->
+
+                <div class="row mt-3 align-items-center" *ngIf="videos.length > 0">
+                    <div class="col-sm">
+                        <div class="text-muted text-center text-sm-start">
+                            Mostrando <span class="fw-semibold">10</span> de <span class="fw-semibold">20</span> Resulstados
+                        </div>
+                    </div>
+                </div>
+                <!-- end pagination-element -->
+            </div>
+        </div><!--end card-->
+    </div><!--end col-->
+</div><!--end row-->

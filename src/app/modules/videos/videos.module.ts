@@ -6,6 +6,10 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { VideoRoutingModule } from './videos.routing.module';
 import { VideosComponent } from './videos/videos.component';
 import { VideoService } from './services/video.service';
+import { VgBufferingModule } from '@videogular/ngx-videogular/buffering';
+import { VgControlsModule } from '@videogular/ngx-videogular/controls';
+import { VgCoreModule } from '@videogular/ngx-videogular/core';
+import { VgOverlayPlayModule } from '@videogular/ngx-videogular/overlay-play';
 
 
 
@@ -19,7 +23,11 @@ import { VideoService } from './services/video.service';
     SharedModule,
     ModalModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    VgCoreModule,
+    VgControlsModule,
+    VgOverlayPlayModule,
+    VgBufferingModule
   ],
   providers: [
     VideoService

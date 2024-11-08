@@ -1,6 +1,9 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { Video } from '../models/video';
 import { ToastrService } from 'ngx-toastr';
+
+import {VgApiService} from '@videogular/ngx-videogular/core';
+
 import { VideoService } from '../services/video.service';
 
 @Component({
@@ -15,20 +18,16 @@ export class VideosComponent {
   videos: Video[] = [];
   video: Video;
 
-  @ViewChild("videoPlayer", { static: false })
-  videoPlayer!: ElementRef;
-  files:string[];
-  message:string;
+  preload: string = 'auto';
+  api: VgApiService = new VgApiService();
+
   fileName:string;
+  onlyFileName:string;
 
   constructor(
     private videoService: VideoService,
     private toastr: ToastrService) {
-
-      this.files = [];
-      this.message = '';
       this.fileName = '';
-
     }
 
   ngOnInit(): void {
@@ -53,19 +52,45 @@ export class VideosComponent {
           )
   }
 
-  onSelectedVideo(fileName: string) {
-    this.videoService.getVideo(fileName).subscribe(
-      response =>{
-        this.fileName = response;
-        this.videoPlayer.nativeElement.src = this.fileName;
-        this.videoPlayer.nativeElement.play();
-      },
-      errors => { this.handleFail(errors); }
+  onPlayerReady(source: VgApiService) {
+    this.api = source;
+    this.api.getDefaultMedia().subscriptions.loadedMetadata.subscribe(
+      this.autoplay.bind(this)
     )
   }
 
+  autoplay() {
+    this.api.play();
+  }
+
+  rewindVideo(seconds: number) {
+    this.api.playbackRate = 2;
+  }
+
+  onSelectedVideo(fileName: string) {
+    this.onlyFileName = fileName;
+    this.fileName = `${this.videoService.UrlServiceV1}video/get-video/${fileName}`;
+  }
+
+  closeVideo() {
+    this.fileName = '';
+  }
+
+  extractTheLast30Seconds(fileName: string): void {
+    this.videoService.extractTheLast30Seconds(fileName).subscribe(blob => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${fileName}_last30seconds.mp4`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    })
+    
+  }
+
   handleFail(fail: any) {
-    console.log(fail);
     this.errors = fail.error;
     this.toastr.error('Ocorreu um erro!', 'Opa :(');
   }

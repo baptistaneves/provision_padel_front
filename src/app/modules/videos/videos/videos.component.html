@@ -43,7 +43,7 @@
                         </thead>
                         <tbody class="list form-check-all">
                             <tr *ngFor="let video of videos">
-                                <td class="products" (click)="onSelectedVideo(video.name)">{{video.name}}</td>
+                                <td class="products" style="cursor: pointer;" (click)="showModal.show()" (click)="onSelectedVideo(video.name)">{{video.name}}</td>
                                 <td class="products">{{video.startTime | date}}</td>
                                 <td class="products">{{video.endTime | date}}</td>
                                 <td class="products">{{ formatSize(video.size) }}</td>
@@ -52,14 +52,6 @@
                         </tbody>
                     </table>
                 </div><!--end table-responsive-->
-
-                <div class="row">
-                    <div class="col-12">
-                        <video autoplay style="height: 300px;width: 400px;" controls #videoPlayer>
-                            <source type="video/mp4" />
-                        </video>
-                    </div>
-                </div>
 
                 <div class="noresult" *ngIf="videos.length <= 0">
                     <div class="text-center py-4">
@@ -86,3 +78,57 @@
         </div><!--end card-->
     </div><!--end col-->
 </div><!--end row-->
+
+<div class="modal fade" bsModal #showModal="bs-modal">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header px-4 pt-4">
+                <h5 class="modal-title" id="exampleModalLabel">{{this.onlyFileName}}</h5>
+                <button type="button" class="btn-close" (click)="showModal.hide()"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <vg-player (onPlayerReady)="onPlayerReady($event)" class="roudend-2">
+                            <vg-overlay-play></vg-overlay-play>
+                            <vg-buffering vgFor="singleVideo"></vg-buffering>
+                            <vg-scrub-bar>
+                                <vg-scrub-bar-current-time vgFor="singleVideo" [vgSlider]="true"></vg-scrub-bar-current-time>
+                                <vg-scrub-bar-buffering-time></vg-scrub-bar-buffering-time>
+                            </vg-scrub-bar>
+                            <vg-controls>
+                                <vg-play-pause></vg-play-pause>
+                                <vg-playback-button></vg-playback-button>
+                                <vg-time-display [vgProperty]="'current'" [vgFormat]="'mm:ss'"></vg-time-display>
+                                <vg-scrub-bar style="pointer-events: none;"></vg-scrub-bar>
+                                <vg-time-display [vgProperty]="'left'" [vgFormat]="'mm:ss'"></vg-time-display>
+                                <vg-time-display [vgProperty]="'total'" [vgFormat]="'mm:ss'"></vg-time-display>
+                                <vg-track-selector></vg-track-selector>
+                                <vg-mute></vg-mute>
+                                <vg-volume></vg-volume>
+                                <vg-fullscreen></vg-fullscreen>
+                                <button (click)="rewindVideo(2)">⏪ Recuar 10s</button>
+                            </vg-controls>
+                            <video [vgMedia]="$any(media)"
+                                   #media id="singleVideo"
+                                   preload="auto"
+                                   src="{{fileName}}"
+                                   type="video/mp4"
+                                   crossorigin>
+                            </video>
+                        </vg-player>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <div class="hstack gap-2 justify-content-end">
+                    <button type="button" class="btn btn-ghost-danger" (click)="closeVideo()" (click)="showModal.hide()"><i class="bi bi-x-lg align-baseline me-1"></i> Fechar</button>
+                    <button type="button" class="btn btn-primary" (click)="extractTheLast30Seconds(this.onlyFileName)"><i class="bi bi-download me-1"></i> Baixar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- modal -->
+

@@ -77,17 +77,7 @@ export class VideosComponent {
   }
 
   extractTheLast30Seconds(fileName: string): void {
-    this.videoService.extractTheLast30Seconds(fileName).subscribe(blob => {
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${fileName}_last30seconds.mp4`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-    })
-    
+    this.videoService.extractTheLast30Seconds(fileName).subscribe();
   }
 
   handleFail(fail: any) {

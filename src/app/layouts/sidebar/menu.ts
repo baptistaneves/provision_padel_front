@@ -21,7 +21,7 @@ export const MENU: MenuItem[] = [
     {
         id: 9,
         label: 'Câmaras',
-        icon: 'ph-calendar',
+        icon: 'ph-camera-thin',
         link: '/camaras',
         parentId: 8
     },
@@ -35,8 +35,15 @@ export const MENU: MenuItem[] = [
     {
         id: 11,
         label: 'Vídeos',
-        icon: 'ph-envelope',
+        icon: 'ph-video-camera-thin',
         link: '/videos',
+        parentId: 8,
+    },
+    {
+        id: 11,
+        label: 'Conexões',
+        icon: 'ph-whatsapp-logo-thin',
+        link: '/conexoes',
         parentId: 8,
     },
     {

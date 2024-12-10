@@ -1,0 +1,213 @@
+<!-- Start Breadcrumbs -->
+<app-breadcrumbs title="Conexões" [breadcrumbItems]="breadCrumbItems"></app-breadcrumbs>
+<!-- End Breadcrumbs -->
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-xxl-12 col-sm-12">
+                        <div>
+                            <input type="search" class="form-control" placeholder="Buscar conexão pelo nome">
+                        </div>
+                    </div><!--end col-->
+                </div><!--end row-->
+            </div>
+        </div>
+    </div><!--end col-->
+</div><!--end row-->
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <h5 class="card-title mb-0">Conexões 
+                        <span *ngIf="connections.length > 0" class="badge bg-dark-subtle text-dark ms-1">{{connections.length}}</span>
+                        <span *ngIf="connections.length <= 0" class="badge bg-dark-subtle text-dark ms-1">0</span>
+                    </h5>
+                </div>
+                <div class="flex-shrink-0">
+                    <div class="d-flex flex-wrap align-items-start gap-2">
+                        <button class="btn btn-subtle-danger d-none" id="remove-actions"><i class="ri-delete-bin-2-line"></i></button>
+                        <button type="button" class="btn btn-primary add-btn" (click)="showModal.show()"><i class="bi bi-plus-circle align-baseline me-1"></i> Adicionar
+                            Conexão</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive" *ngIf="connections.length > 0">
+                    <table class="table table-centered align-middle table-nowrap mb-0">
+                        <thead class="table-active">
+                            <tr>
+                                <th class="cursor-pointer">Nome</th>
+                                <th class="cursor-pointer">Número</th>
+                                <th class="cursor-pointer">Sessão</th>
+                                <th class="cursor-pointer">Status</th>
+                                <th>Acções</th>
+                            </tr>
+                        </thead>
+                        <tbody class="list form-check-all">
+                            <tr *ngFor="let connection of connections">
+                                <td class="products">{{connection.name}}</td>
+                                <td class="products">{{connection.number}}</td>
+
+                                <!-- QrCode Button -->
+                                <td class="products" *ngIf="connection.connectionStatus === 'connecting'">
+                                    <button type="button" class="btn btn-primary" (click)="getQrCode(connection.name)" (click)="qrcode.show()"
+                                    placement="top" tooltip="Conectar">
+                                        <span class="ph-qr-code-bold"></span>
+                                    </button>
+                                </td>
+                                <td class="products" *ngIf="connection.connectionStatus === 'close'">
+                                    <button type="button" class="btn btn-primary" (click)="getQrCode(connection.name)" (click)="qrcode.show()"
+                                    placement="top" tooltip="Conectar">
+                                        <span class="ph-qr-code-bold"></span>
+                                    </button>
+                                </td>
+
+                                <!-- Logout Button -->
+                                <td class="products" *ngIf="connection.connectionStatus === 'open'">
+                                    <button type="button" class="btn btn-danger" (click)="logout(connection.name)" placement="top" tooltip="Desconectar">
+                                        <span class="ph-power-thin"></span>
+                                    </button>
+                                </td>
+
+                                <!-- Status -->
+                                <td *ngIf="connection.connectionStatus === 'open'">
+                                    <span class="alert alert-success p-1">Conectado</span>
+                                </td>
+                                <td *ngIf="connection.connectionStatus === 'connecting'">
+                                    <span class="alert alert-warning p-1">Desconectado</span>
+                                </td>
+                                <td *ngIf="connection.connectionStatus === 'close'">
+                                    <span class="alert alert-warning p-1">Desconectado</span>
+                                </td>
+                                <td>
+                                    <div class="hstack gap-3 flex-wrap">
+                                        <a href="javascript:void(0);" class="link-danger fs-base" (click)="markConnectionToRemove(connection.name)"
+                                         (click)="deleteRecordModal.show()">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div><!--end table-responsive-->
+
+                <div class="noresult" *ngIf="connections.length <= 0">
+                    <div class="text-center py-4">
+                        <div class="avatar-md mx-auto mb-4">
+                            <div class="avatar-title bg-light text-primary rounded-circle fs-4xl">
+                                <i class="bi bi-search"></i>
+                            </div>
+                        </div>
+                        <h5 class="mt-2">Nenhuma conexão cadastrada</h5>
+                        <p class="text-muted mb-0">Cadastre as conexões para serem listadas</p>
+                    </div>
+                </div>
+                <!-- end noresult -->
+
+                <div class="row mt-3 align-items-center" *ngIf="connections.length > 0">
+                    <div class="col-sm">
+                        <div class="text-muted text-center text-sm-start">
+                            Mostrando <span class="fw-semibold">10</span> de <span class="fw-semibold">20</span> Resulstados
+                        </div>
+                    </div>
+                </div>
+                <!-- end pagination-element -->
+            </div>
+        </div><!--end card-->
+    </div><!--end col-->
+</div><!--end row-->
+
+<div class="modal fade" bsModal #showModal="bs-modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header px-4 pt-4">
+                <h5 class="modal-title" id="exampleModalLabel">Adicionar Câmara</h5>
+                <button type="button" class="btn-close" (click)="showModal.hide()"></button>
+            </div>
+
+            <form class="tablelist-form" [formGroup]="addForm" (ngSubmit)="add()" novalidate autocomplete="off">
+                <div class="modal-body p-4">
+                    <div id="alert-error-msg" class="d-none alert alert-danger py-2"></div>
+
+                    <div class="mb-3">
+                        <label for="product-title-input" class="form-label">Nome</label>
+                        <input 
+                        type="text" 
+                        formControlName="instanceName" 
+                        class="form-control" 
+                        placeholder="Digite o nome da conexão"
+                        [ngClass]="{ 'is-invalid': f['instanceName'].errors && f['instanceName'].touched }"
+                        required>
+                        <div *ngIf="f['instanceName'].errors && f['instanceName'].touched" class="text-danger">
+                            <div *ngIf="f['instanceName'].errors['required']">Por favor, informe o nome da instancia</div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <div class="hstack gap-2 justify-content-end">
+                        <button type="button" class="btn btn-ghost-danger" (click)="showModal.hide()"><i class="bi bi-x-lg align-baseline me-1"></i> Fechar</button>
+                        <button type="submit" class="btn btn-primary" [disabled]="addForm.invalid">Salvar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- modal -->
+
+<div bsModal #qrcode="bs-modal" class="modal fade" id="staticBackdrop">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center p-5">
+                <i class="ph-qr-code-light display-5 text-primary"></i>
+                <div class="mt-4">
+                    <h5 class="mb-3">Escaneie o código QR com o seu WhatsApp Web.</h5>
+                    <div class="row my-2" *ngIf="imagemBase64">
+                        <!-- figures Images -->
+                        <figure class="figure">
+                            <img  [src]="imagemBase64" class="img-fluid" alt="Responsive image">
+                        </figure>
+                    </div>
+                    <div class="hstack gap-2 justify-content-center">
+                        <a href="javascript:void(0);" class="btn btn-link link-primary fw-medium" (click)="qrcode.hide()" (click)="listConnections()">
+                            <i class="ri-check-line me-1 align-middle"></i>Conectado
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- deleteRecordModal -->
+<div id="deleteRecordModal" class="modal fade zoomIn" bsModal #deleteRecordModal="bs-modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" id="deleteRecord-close" (click)="deleteRecordModal.hide()"></button>
+            </div>
+            <div class="modal-body p-md-5">
+                <div class="text-center">
+                    <div class="text-danger">
+                        <i class="bi bi-trash display-4"></i>
+                    </div>
+                    <div class="mt-4">
+                        <h3 class="mb-2">Você tem certeza ?</h3>
+                        <p class="text-muted fs-lg mx-3 mb-0">Deseja realmente remover este registro ?</p>
+                    </div>
+                </div>
+                <div class="d-flex gap-2 justify-content-center mt-4 mb-2">
+                    <button type="button" class="btn w-sm btn-light btn-hover" (click)="deleteRecordModal.hide()">Cancelar</button>
+                    <button type="button" class="btn w-sm btn-danger btn-hover" (click)="remove()" (click)="deleteRecordModal.hide()">Sim, Remova!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

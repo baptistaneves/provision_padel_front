@@ -17,6 +17,7 @@ export class CourtsComponent {
   errors: any[] = [];
   courts: Court[] = [];
   court: Court;
+  courtId: string;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -34,6 +35,7 @@ export class CourtsComponent {
 
     this.listCourts();
     this.initializeAddForm();
+    this.initializeEditForm();
   }
 
   listCourts() {
@@ -52,8 +54,23 @@ export class CourtsComponent {
       description: ['', [Validators.required]]
     });
   }
+
+  initializeEditForm() {
+    this.editForm = this.formBuilder.group({
+      id: [''],
+      description: ['', [Validators.required]]
+    });
+  }
+
+  fillForm(court: Court) {
+      this.editForm.patchValue({
+        id: court.id,
+        description: court.description
+      });
+    }
   
   get f(){ return this.addForm.controls; }
+  get e(){ return this.editForm.controls; }
 
   add() {
     if(this.addForm.dirty && this.addForm.valid) {
@@ -61,15 +78,39 @@ export class CourtsComponent {
 
       this.courtService.add(this.court)
             .subscribe(
-              sucesso => { this.handleSuccess() },
+              sucesso => { this.handleSuccess('Campo adicionado com sucesso!') },
               erros => { this.handleFail(erros) }
             );
     }
   }
 
-  handleSuccess() {
+  edit() {
+    if(this.editForm.dirty && this.editForm.valid) {
+      this.court = Object.assign({}, this.court, this.editForm.value);
+
+      this.courtService.update(this.court)
+            .subscribe(
+              sucesso => { this.handleSuccess('Campo actualizado com sucesso!') },
+              erros => { this.handleFail(erros) }
+            );
+    }
+  }
+
+  markCourtToRemove(courtId: string) {
+    this.courtId = courtId;
+  }
+
+  remove() {
+    this.courtService.remove(this.courtId)
+    .subscribe(
+      sucesso => { this.handleSuccess('Câmara removida com sucesso!') },
+      erros => { this.handleFail(erros) }
+    );
+  }
+
+  handleSuccess(message: string) {
     this.addForm.reset();
-    this.toastr.success('Campo adicionado com sucesso!', 'Sucesso ):');
+    this.toastr.success(message, 'Sucesso ):');
     this.listCourts();
   }
 

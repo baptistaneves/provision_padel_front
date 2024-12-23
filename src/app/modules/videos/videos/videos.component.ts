@@ -3,6 +3,7 @@ import { Video } from '../models/video';
 import { ToastrService } from 'ngx-toastr';
 
 import {VgApiService} from '@videogular/ngx-videogular/core';
+import { NgTinyUrlService } from 'ng-tiny-url';
 
 import { VideoService } from '../services/video.service';
 
@@ -24,9 +25,12 @@ export class VideosComponent {
   fileName:string;
   onlyFileName:string;
 
+  shortenedUrl: string;
+
   constructor(
     private videoService: VideoService,
-    private toastr: ToastrService) {
+    private toastr: ToastrService,
+    private tinyUrl: NgTinyUrlService) {
       this.fileName = '';
     }
 
@@ -95,6 +99,23 @@ export class VideosComponent {
         return `${sizeInGB.toFixed(2)} GB`;
     }
     return `${sizeInMB.toFixed(2)} MB`;
+  }
+
+  getTinyUrl(originalUrl: string) {
+    this.tinyUrl.shorten(originalUrl).subscribe(
+      (res) => {
+        this.shortenedUrl = res != '' && res != null ? res : '';
+        this.copyToClipboard(this.shortenedUrl)
+      },
+      (err) => console.log
+    );
+  }
+
+  private copyToClipboard(url: string): void {
+    navigator.clipboard.writeText(url).then(
+      () => this.toastr.success('URL copiada para a área de transferência!'),
+      (err) => this.toastr.error('Erro ao copiar a URL: ')
+    );
   }
 
 }

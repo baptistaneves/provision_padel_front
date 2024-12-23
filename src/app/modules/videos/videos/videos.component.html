@@ -39,19 +39,25 @@
                                 <th class="sort cursor-pointer">Data Fim</th>
                                 <th class="sort cursor-pointer">Tamanho</th>
                                 <th class="sort cursor-pointer">Câmara</th>
+                                <th>Url</th>
                             </tr>
                         </thead>
                         <tbody class="list form-check-all">
                             <tr *ngFor="let video of videos">
                                 <td class="products" style="cursor: pointer;" (click)="showModal.show()" (click)="onSelectedVideo(video.name)">{{video.name}}</td>
-                                <td class="products">{{video.startTime | date}}</td>
-                                <td class="products">{{video.endTime | date}}</td>
+                                <td class="products">{{video.startTime | datePt:'short'}}</td>
+                                <td class="products">{{video.endTime | datePt:'short'}}</td>
                                 <td class="products">{{ formatSize(video.size) }}</td>
-                                <td class="products">{{video.channel}}</td>
+                                <td class="products">{{video.cameraChannel}}</td>
+                                <td>
+                                    <button type="button" class="btn btn-primary" (click)="getTinyUrl(video.videoDownloadUrl)" placement="top" tooltip="Cópiar url para download">
+                                        <i class="ri-file-copy-line"></i>
+                                    </button>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
-                </div><!--end table-responsive-->
+                </div>
 
                 <div class="noresult" *ngIf="videos.length <= 0">
                     <div class="text-center py-4">
@@ -84,7 +90,7 @@
         <div class="modal-content">
             <div class="modal-header px-4 pt-4">
                 <h5 class="modal-title" id="exampleModalLabel">{{this.onlyFileName}}</h5>
-                <button type="button" class="btn-close" (click)="showModal.hide()"></button>
+                <button type="button" class="btn-close" (click)="closeVideo()" (click)="showModal.hide()"></button>
             </div>
             <div class="modal-body">
                 <div class="row">

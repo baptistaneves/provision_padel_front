@@ -165,10 +165,13 @@
 <div bsModal #qrcode="bs-modal" class="modal fade" id="staticBackdrop">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
+            <div class="modal-header px-4 pt-4">
+                <button type="button" class="btn-close" (click)="qrcode.hide()"></button>
+            </div>
             <div class="modal-body text-center p-5">
                 <i class="ph-qr-code-light display-5 text-primary"></i>
                 <div class="mt-4">
-                    <h5 class="mb-3">Escaneie o código QR com o seu WhatsApp Web.</h5>
+                    <h5 class="mb-3">Escaneie o código QR com o seu WhatsApp.</h5>
                     <div class="row my-2" *ngIf="imagemBase64">
                         <!-- figures Images -->
                         <figure class="figure">

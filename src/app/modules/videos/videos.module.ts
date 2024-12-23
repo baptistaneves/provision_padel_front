@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { LOCALE_ID, NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ModalModule } from 'ngx-bootstrap/modal';
@@ -10,11 +10,18 @@ import { VgBufferingModule } from '@videogular/ngx-videogular/buffering';
 import { VgControlsModule } from '@videogular/ngx-videogular/controls';
 import { VgCoreModule } from '@videogular/ngx-videogular/core';
 import { VgOverlayPlayModule } from '@videogular/ngx-videogular/overlay-play';
+import { DatePtPipe } from './pipes/date-pt.pipe';
+
+import { registerLocaleData } from '@angular/common';
+import localePt from '@angular/common/locales/pt';
+import { TooltipModule } from 'ngx-bootstrap/tooltip';
 
 
+registerLocaleData(localePt, 'pt-PT');
 
 @NgModule({
   declarations: [
+    DatePtPipe,
     VideosComponent
   ],
   imports: [
@@ -27,9 +34,11 @@ import { VgOverlayPlayModule } from '@videogular/ngx-videogular/overlay-play';
     VgCoreModule,
     VgControlsModule,
     VgOverlayPlayModule,
-    VgBufferingModule
+    VgBufferingModule,
+     TooltipModule.forRoot()
   ],
   providers: [
+    { provide: LOCALE_ID, useValue: 'pt-PT' },
     VideoService
   ]
 })

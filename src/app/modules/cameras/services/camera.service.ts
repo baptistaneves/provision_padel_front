@@ -37,7 +37,7 @@ export class CameraService extends BaseService {
 
   update(camera: Camera) : Observable<any>{
     let response = this.http
-        .put<Camera>(this.UrlServiceV1 + "camera/", camera, this.GetHeaderFormData())
+        .put<Camera>(this.UrlServiceV1 + "camera/update", camera, this.GetHeaderFormData())
         .pipe((
           map(this.extractData),
           catchError(this.serviceError)));
@@ -47,7 +47,7 @@ export class CameraService extends BaseService {
 
   remove(id:string) : Observable<any>{
     return this.http
-      .delete<any>(this.UrlServiceV1 + "camera/" + id, this.GetAuthHeaderJson())
+      .delete<any>(this.UrlServiceV1 + "camera/remove/" + id, this.GetAuthHeaderJson())
       .pipe(catchError(super.serviceError));
   }
 

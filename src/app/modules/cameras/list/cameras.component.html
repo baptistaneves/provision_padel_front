@@ -42,19 +42,44 @@
                         <thead class="table-active">
                             <tr>
                                 <th class="cursor-pointer">Canal</th>
-                                <th class="cursor-pointer">Estado</th>
-                                <th></th>
+                                <th class="cursor-pointer">Status</th>
+                                <th class="cursor-pointer">Campo</th>
+                                <th>Acções</th>
                             </tr>
                         </thead>
                         <tbody class="list form-check-all">
                             <tr *ngFor="let camera of cameras">
                                 <td class="products">{{camera.channel}}</td>
                                 <td class="products" *ngIf="!camera.isRecording">Parada</td>
-                                <td class="products" *ngIf="camera.isRecording">Gravando</td>
-                                <td *ngIf="camera.isRecording">
+                                <td class="products" *ngIf="camera.isRecording">
+                                    Gravando
                                     <span class="spinner-grow flex-shrink-0 text-danger" role="status" style="width: 20px; height: 20px;">
                                         <span class="visually-hidden">Loading...</span>
                                     </span>
+                                </td>
+                                <td>{{camera.courtDescription}}</td>
+                                <td>
+                                    <div class="hstack gap-3 flex-wrap">
+                                        <a href="javascript:void(0);" class="link-danger fs-base" (click)="markCameraToRemove(camera.id)"
+                                         (click)="deleteRecordModal.show()">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </a>
+                                        <a href="javascript:void(0);" class="link-success fs-base"
+                                         (click)="fillForm(camera)"
+                                         (click)="editModal.show()">
+                                            <i class=" ri-edit-line"></i>
+                                        </a>
+                                        <a href="javascript:void(0);" class="bg-primary-subtle text-primary p-1" 
+                                         style="border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; align-items: center;"
+                                         (click)="startRecording(camera.channel)" *ngIf="!camera.isRecording">
+                                            <i class="ri-play-line"></i>
+                                        </a>
+                                        <a href="javascript:void(0);" class="bg-danger-subtle text-danger p-1" 
+                                         style="border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; align-items: center;"
+                                         (click)="stopRecording(camera.channel)" *ngIf="camera.isRecording">
+                                            <i class=" ri-stop-circle-line"></i>
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>
@@ -87,6 +112,7 @@
     </div><!--end col-->
 </div><!--end row-->
 
+<!-- AddCameraModal -->
 <div class="modal fade" bsModal #showModal="bs-modal">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -113,11 +139,75 @@
                         </div>
                     </div>
 
+                    <div class="mb-3">
+                        <label for="product-title-input" class="form-label">Seleccione o campo</label>
+                        <ng-select [items]="courts" bindValue="id" bindLabel="description"
+                         formControlName="courtId" [ngClass]="{ 'is-invalid': f['courtId'].errors && f['courtId'].touched }">
+                            
+                        </ng-select>
+                        <div *ngIf="f['courtId'].errors && f['courtId'].touched" class="text-danger">
+                            <div *ngIf="f['courtId'].errors['required']">Por favor, seleccione o campo</div>
+                        </div>
+                    </div>
+
                 </div>
                 <div class="modal-footer">
                     <div class="hstack gap-2 justify-content-end">
                         <button type="button" class="btn btn-ghost-danger" (click)="showModal.hide()"><i class="bi bi-x-lg align-baseline me-1"></i> Fechar</button>
                         <button type="submit" class="btn btn-primary" [disabled]="addForm.invalid">Salvar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- modal -->
+
+<!-- AddCameraModal -->
+<div class="modal fade" bsModal #editModal="bs-modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header px-4 pt-4">
+                <h5 class="modal-title" id="exampleModalLabel">Editar Câmara</h5>
+                <button type="button" class="btn-close" (click)="editModal.hide()"></button>
+            </div>
+
+            <form class="tablelist-form" [formGroup]="editForm" (ngSubmit)="edit()" novalidate autocomplete="off">
+                <div class="modal-body p-4">
+                    <div id="alert-error-msg" class="d-none alert alert-danger py-2"></div>
+
+                    <input type="hidden" formControlName="id">
+
+                    <div class="mb-3">
+                        <label for="product-title-input" class="form-label">Canal</label>
+                        <input 
+                        type="number" 
+                        formControlName="channel" 
+                        class="form-control" 
+                        placeholder="Digite o número do canal"
+                        [ngClass]="{ 'is-invalid': e['channel'].errors && f['channel'].touched }"
+                        required>
+                        <div *ngIf="e['channel'].errors && e['channel'].touched" class="text-danger">
+                            <div *ngIf="e['channel'].errors['required']">Por favor, informe o número do canal</div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="product-title-input" class="form-label">Seleccione o campo</label>
+                        <ng-select [items]="courts" bindValue="id" bindLabel="description"
+                         formControlName="courtId" [ngClass]="{ 'is-invalid': e['courtId'].errors && e['courtId'].touched }">
+                            
+                        </ng-select>
+                        <div *ngIf="e['courtId'].errors && e['courtId'].touched" class="text-danger">
+                            <div *ngIf="e['courtId'].errors['required']">Por favor, seleccione o campo</div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <div class="hstack gap-2 justify-content-end">
+                        <button type="button" class="btn btn-ghost-danger" (click)="editModal.hide()"><i class="bi bi-x-lg align-baseline me-1"></i> Fechar</button>
+                        <button type="submit" class="btn btn-primary" [disabled]="editForm.invalid">Salvar</button>
                     </div>
                 </div>
             </form>
@@ -139,13 +229,13 @@
                         <i class="bi bi-trash display-4"></i>
                     </div>
                     <div class="mt-4">
-                        <h3 class="mb-2">Are you sure ?</h3>
-                        <p class="text-muted fs-lg mx-3 mb-0">Are you sure you want to remove this record ?</p>
+                        <h3 class="mb-2">Você tem certeza ?</h3>
+                        <p class="text-muted fs-lg mx-3 mb-0">Deseja realmente remover este registo ?</p>
                     </div>
                 </div>
                 <div class="d-flex gap-2 justify-content-center mt-4 mb-2">
-                    <button type="button" class="btn w-sm btn-light btn-hover" (click)="deleteRecordModal.hide()">Close</button>
-                    <button type="button" class="btn w-sm btn-danger btn-hover" id="delete-record">Yes, Delete It!</button>
+                    <button type="button" class="btn w-sm btn-light btn-hover" (click)="deleteRecordModal.hide()">Cancelar</button>
+                    <button type="button" class="btn w-sm btn-danger btn-hover" (click)="remove()" (click)="deleteRecordModal.hide()">Sim, Remover!</button>
                 </div>
             </div>
         </div>

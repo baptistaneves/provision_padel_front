@@ -42,11 +42,25 @@
                         <thead class="table-active">
                             <tr>
                                 <th class="sort cursor-pointer">Descrição</th>
+                                <th class="cursor-pointer">Acções</th>
                             </tr>
                         </thead>
                         <tbody class="list form-check-all">
                             <tr *ngFor="let court of courts">
                                 <td class="products">{{court.description}}</td>
+                                <td>
+                                    <div class="hstack gap-3 flex-wrap">
+                                        <a href="javascript:void(0);" class="link-danger fs-base" (click)="markCourtToRemove(court.id)"
+                                         (click)="deleteRecordModal.show()">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </a>
+                                        <a href="javascript:void(0);" class="link-success fs-base"
+                                        (click)="fillForm(court)"
+                                        (click)="editModal.show()">
+                                            <i class=" ri-edit-line"></i>
+                                        </a>
+                                    </div>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -117,6 +131,49 @@
 </div>
 <!-- modal -->
 
+<!-- editModal -->
+
+<div class="modal fade" bsModal #editModal="bs-modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header px-4 pt-4">
+                <h5 class="modal-title" id="exampleModalLabel">Actualizar Campo</h5>
+                <button type="button" class="btn-close" (click)="showModal.hide()"></button>
+            </div>
+
+            <form class="tablelist-form" novalidate autocomplete="off" [formGroup]="editForm" (ngSubmit)="edit()">
+                <div class="modal-body p-4">
+                    <div id="alert-error-msg" class="d-none alert alert-danger py-2"></div>
+
+                    <input type="hidden" formControlName="id">
+
+                    <div class="mb-3">
+                        <label for="product-title-input" class="form-label">Descrição</label>
+                        <input 
+                        type="text"  
+                        formControlName="description" 
+                        class="form-control" 
+                        placeholder="Digite a descrição do campo" 
+                        [ngClass]="{ 'is-invalid': e['description'].errors && e['description'].touched }"
+                        required>
+                        <div *ngIf="e['description'].errors && e['description'].touched" class="text-danger">
+                            <div *ngIf="e['description'].errors['required']">Por favor, informe a descrição do campo</div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <div class="hstack gap-2 justify-content-end">
+                        <button type="button" class="btn btn-ghost-danger" (click)="editModal.hide()"><i class="bi bi-x-lg align-baseline me-1"></i> Fechar</button>
+                        <button type="submit" class="btn btn-primary" [disabled]="editForm.invalid">Salvar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- modal -->
+
 <!-- deleteRecordModal -->
 <div id="deleteRecordModal" class="modal fade zoomIn" bsModal #deleteRecordModal="bs-modal">
     <div class="modal-dialog modal-dialog-centered">
@@ -130,13 +187,13 @@
                         <i class="bi bi-trash display-4"></i>
                     </div>
                     <div class="mt-4">
-                        <h3 class="mb-2">Are you sure ?</h3>
-                        <p class="text-muted fs-lg mx-3 mb-0">Are you sure you want to remove this record ?</p>
+                        <h3 class="mb-2">Você tem certeza ?</h3>
+                        <p class="text-muted fs-lg mx-3 mb-0">Deseja realmente remover este registo ?</p>
                     </div>
                 </div>
                 <div class="d-flex gap-2 justify-content-center mt-4 mb-2">
-                    <button type="button" class="btn w-sm btn-light btn-hover" (click)="deleteRecordModal.hide()">Close</button>
-                    <button type="button" class="btn w-sm btn-danger btn-hover" id="delete-record">Yes, Delete It!</button>
+                    <button type="button" class="btn w-sm btn-light btn-hover" (click)="deleteRecordModal.hide()">Cancelar</button>
+                    <button type="button" class="btn w-sm btn-danger btn-hover" (click)="remove()" (click)="deleteRecordModal.hide()">Sim, Remover!</button>
                 </div>
             </div>
         </div>

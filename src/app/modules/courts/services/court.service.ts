@@ -35,7 +35,7 @@ export class CourtService extends BaseService {
 
   update(court: Court) : Observable<any>{
     let response = this.http
-        .put<Court>(this.UrlServiceV1 + "court/", court, this.GetHeaderFormData())
+        .put<Court>(this.UrlServiceV1 + "court/update", court, this.GetHeaderFormData())
         .pipe((
           map(this.extractData),
           catchError(this.serviceError)));
@@ -45,7 +45,7 @@ export class CourtService extends BaseService {
 
   remove(id:string) : Observable<any>{
     return this.http
-      .delete<any>(this.UrlServiceV1 + "court/" + id, this.GetAuthHeaderJson())
+      .delete<any>(this.UrlServiceV1 + "court/remove/" + id, this.GetAuthHeaderJson())
       .pipe(catchError(super.serviceError));
   }
   
